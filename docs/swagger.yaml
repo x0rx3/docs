@@ -1,0 +1,360 @@
+definitions:
+  dto.AuthData:
+    properties:
+      login:
+        type: string
+      pswd:
+        type: string
+    type: object
+  dto.DataResponse:
+    properties:
+      data: {}
+    type: object
+  dto.DocsResponse:
+    properties:
+      file:
+        type: string
+      json:
+        additionalProperties: {}
+        type: object
+    type: object
+  dto.Meta:
+    properties:
+      create_at:
+        type: string
+      file:
+        type: boolean
+      grant:
+        items:
+          type: string
+        type: array
+      id:
+        type: string
+      mime:
+        type: string
+      name:
+        type: string
+      public:
+        type: boolean
+      token:
+        type: string
+    type: object
+  dto.Registration:
+    properties:
+      login:
+        type: string
+      pswd:
+        type: string
+      token:
+        type: string
+    type: object
+  dto.SuccessResponse:
+    properties:
+      response: {}
+    type: object
+  dto.Token:
+    properties:
+      token:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /auth:
+    post:
+      consumes:
+      - application/json
+      description: Login with login & password
+      parameters:
+      - description: docs data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AuthData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                response:
+                  $ref: '#/definitions/dto.Token'
+              type: object
+      summary: Login
+      tags:
+      - Auth
+  /auth/{token}:
+    delete:
+      consumes:
+      - application/json
+      description: Logout
+      parameters:
+      - description: Access Token
+        in: path
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                response:
+                  type: string
+              type: object
+      summary: Logout
+      tags:
+      - Auth
+  /docs:
+    get:
+      consumes:
+      - application/json
+      description: Get list of document
+      parameters:
+      - description: docsorization token
+        in: query
+        name: token
+        required: true
+        type: string
+      - description: Filter by grant login
+        in: query
+        name: login
+        type: string
+      - description: Filter field key
+        in: query
+        name: key
+        type: string
+      - description: Value of filter
+        in: query
+        name: value
+        type: string
+      - description: Limit, default 10
+        in: query
+        name: limit
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: File data
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.DataResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.Meta'
+                  type: array
+              type: object
+      summary: List Documents
+      tags:
+      - Document
+    head:
+      consumes:
+      - application/json
+      description: Get list of document
+      parameters:
+      - description: docsorization token
+        in: query
+        name: token
+        required: true
+        type: string
+      - description: Filter by grant login
+        in: query
+        name: login
+        type: string
+      - description: Filter field key
+        in: query
+        name: key
+        type: string
+      - description: Value of filter
+        in: query
+        name: value
+        type: string
+      - description: Limit, default 10
+        in: query
+        name: limit
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: File data
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.DataResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.Meta'
+                  type: array
+              type: object
+      summary: List Documents
+      tags:
+      - Document
+    post:
+      consumes:
+      - multipart/form-data
+      description: Add new document
+      parameters:
+      - description: Document meta data (JSON)
+        example: '{"name":"photo.jpg","file":true,"public":false,"token":"sfuqwejqjoiu93e29","mime":"image/jpg","grant":["login1","login2"]}'
+        in: formData
+        name: meta
+        required: true
+        type: string
+      - description: Extantion data for document (JSON)
+        example: '{"key":"value"}'
+        in: formData
+        name: json
+        type: string
+      - description: Document file
+        in: formData
+        name: file
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.DataResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.DocsResponse'
+              type: object
+      summary: Add Document
+      tags:
+      - Document
+  /docs/{uuid}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete document by uuid
+      parameters:
+      - description: Document ID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: docsorization token
+        in: query
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: File data
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                response:
+                  type: string
+              type: object
+      summary: Delete document Documents
+      tags:
+      - Document
+    get:
+      consumes:
+      - application/json
+      - multipart/form-data
+      description: Get one document
+      parameters:
+      - description: Document ID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: docsorization token
+        in: query
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      - multipart/form-data
+      responses:
+        "200":
+          description: File data
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.DataResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.Meta'
+              type: object
+      summary: Get Documents
+      tags:
+      - Document
+    head:
+      consumes:
+      - application/json
+      - multipart/form-data
+      description: Get one document
+      parameters:
+      - description: Document ID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: docsorization token
+        in: query
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      - multipart/form-data
+      responses:
+        "200":
+          description: File data
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.DataResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.Meta'
+              type: object
+      summary: Get Documents
+      tags:
+      - Document
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Registration new user
+      parameters:
+      - description: Regestration data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Registration'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: desc
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                response:
+                  type: string
+              type: object
+      summary: Registration new user
+      tags:
+      - Registration
+swagger: "2.0"
